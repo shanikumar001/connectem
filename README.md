@@ -26,4 +26,3 @@ npm run dev  # or node server.js
 - Request access workflows
 - Responsive UI with Tailwind/Shadcn
 
-Built with ShaniKumar.
