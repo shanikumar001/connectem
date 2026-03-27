@@ -6,9 +6,10 @@ import { useEffect } from "react";
 interface HomePageProps {
   onRequestAccess: () => void;
   onSignIn: () => void;
+  isLoggedIn: boolean;
 }
 
-export function HomePage({ onRequestAccess, onSignIn }: HomePageProps) {
+export function HomePage({ onRequestAccess, onSignIn, isLoggedIn }: HomePageProps) {
   useEffect(() => {
     const elements = document.querySelectorAll(".reveal");
     const observer = new IntersectionObserver(
@@ -56,14 +57,16 @@ export function HomePage({ onRequestAccess, onSignIn }: HomePageProps) {
               >
                 Request Access
               </Button>
-              <Button
-                variant="outline"
-                onClick={onSignIn}
-                data-ocid="hero.sign_in.secondary_button"
-                className="rounded-full border-foreground/30 hover:border-foreground text-foreground px-7 py-5 text-sm font-medium"
-              >
-                Existing account <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              {!isLoggedIn && (
+                <Button
+                  variant="outline"
+                  onClick={onSignIn}
+                  data-ocid="hero.sign_in.secondary_button"
+                  className="rounded-full border-foreground/30 hover:border-foreground text-foreground px-7 py-5 text-sm font-medium"
+                >
+                  Existing account <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              )}
             </div>
           </motion.div>
 

@@ -18,6 +18,10 @@ const auth = async (req, res, next) => {
 
     req.user = user;
     req.userId = user._id;
+    req.auth = {
+      role: decoded.role || user.role,
+      isAdmin: Boolean(decoded.isAdmin || user.isAdmin),
+    };
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Invalid or expired token' });
@@ -25,10 +29,20 @@ const auth = async (req, res, next) => {
 };
 
 const adminOnly = (req, res, next) => {
-  if (!req.user || !req.user.isAdmin) {
+  if (!req.user || !req.auth?.isAdmin) {
     return res.status(403).json({ error: 'Admin access required' });
   }
   next();
 };
 
-module.exports = { auth, adminOnly };
+const requireRoles = (...roles) => (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  if (!roles.includes(req.auth?.role)) {
+    return res.status(403).json({ error: 'Insufficient role permissions' });
+  }
+  return next();
+};
+
+module.exports = { auth, adminOnly, requireRoles };

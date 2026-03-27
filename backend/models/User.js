@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const mentorProfileSchema = new mongoose.Schema({
   fullName: { type: String, default: '' },
@@ -56,6 +57,22 @@ const userSchema = new mongoose.Schema({
     type: companyProfileSchema,
     default: null,
   },
+  refreshTokenHash: {
+    type: String,
+    default: null,
+  },
+  refreshTokenExpiresAt: {
+    type: Date,
+    default: null,
+  },
+  passwordResetTokenHash: {
+    type: String,
+    default: null,
+  },
+  passwordResetExpiresAt: {
+    type: Date,
+    default: null,
+  },
 }, { timestamps: true });
 
 // Hash password before saving
@@ -75,7 +92,54 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
+  delete obj.refreshTokenHash;
+  delete obj.passwordResetTokenHash;
   return obj;
+};
+
+userSchema.methods.setRefreshToken = async function (refreshToken, expiresAt) {
+  this.refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+  this.refreshTokenExpiresAt = expiresAt;
+};
+
+userSchema.methods.matchesRefreshToken = async function (refreshToken) {
+  if (!this.refreshTokenHash || !this.refreshTokenExpiresAt) {
+    return false;
+  }
+  if (this.refreshTokenExpiresAt.getTime() < Date.now()) {
+    return false;
+  }
+  const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+  return tokenHash === this.refreshTokenHash;
+};
+
+userSchema.methods.clearRefreshToken = function () {
+  this.refreshTokenHash = null;
+  this.refreshTokenExpiresAt = null;
+};
+
+userSchema.methods.createPasswordResetToken = function (ttlMs = 1000 * 60 * 15) {
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+  this.passwordResetTokenHash = tokenHash;
+  this.passwordResetExpiresAt = new Date(Date.now() + ttlMs);
+  return rawToken;
+};
+
+userSchema.methods.matchesPasswordResetToken = function (rawToken) {
+  if (!this.passwordResetTokenHash || !this.passwordResetExpiresAt) {
+    return false;
+  }
+  if (this.passwordResetExpiresAt.getTime() < Date.now()) {
+    return false;
+  }
+  const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+  return tokenHash === this.passwordResetTokenHash;
+};
+
+userSchema.methods.clearPasswordResetToken = function () {
+  this.passwordResetTokenHash = null;
+  this.passwordResetExpiresAt = null;
 };
 
 module.exports = mongoose.model('User', userSchema);

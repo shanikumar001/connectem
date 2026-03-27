@@ -84,9 +84,9 @@ export function AuthProvider({
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
-    localStorage.setItem(TOKEN_KEY, data.token);
+    localStorage.setItem(TOKEN_KEY, data.accessToken);
     localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-    setToken(data.token);
+    setToken(data.accessToken);
     setUser(data.user);
   }, []);
 
@@ -96,15 +96,20 @@ export function AuthProvider({
         method: "POST",
         body: JSON.stringify({ email, password, role }),
       });
-      localStorage.setItem(TOKEN_KEY, data.token);
+      localStorage.setItem(TOKEN_KEY, data.accessToken);
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-      setToken(data.token);
+      setToken(data.accessToken);
       setUser(data.user);
     },
     [],
   );
 
   const logout = useCallback(() => {
+    void apiFetch<{ message: string }>("/api/auth/logout", {
+      method: "POST",
+    }).catch(() => {
+      // Clear client state even if logout request fails.
+    });
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     setToken(null);
