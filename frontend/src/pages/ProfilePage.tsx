@@ -13,6 +13,7 @@ import {
   ExternalLink,
   Loader2,
   MapPin,
+  Phone,
   Plus,
   Users,
   X,
@@ -138,9 +139,9 @@ export function ProfilePage() {
                 <Badge variant="secondary" className="capitalize">
                   {profile.role}
                 </Badge>
-                {mp?.title && (
+                {(mp?.expertise || mp?.title) && (
                   <span className="text-sm text-muted-foreground">
-                    {mp.title}
+                    {mp.expertise || mp.title}
                   </span>
                 )}
                 {cp?.industry && (
@@ -209,6 +210,17 @@ export function ProfilePage() {
                       </p>
                       <p className="text-sm font-medium">
                         {mp.availability || "—"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <Phone className="h-4 w-4 text-muted-foreground mt-0.5" />
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider mb-0.5">
+                        Phone
+                      </p>
+                      <p className="text-sm font-medium">
+                        {mp.phone || "—"}
                       </p>
                     </div>
                   </div>
@@ -342,6 +354,11 @@ export function ProfilePage() {
                   <p className="text-sm text-muted-foreground">
                     {cp.contactEmail}
                   </p>
+                  {cp.contactPhone && (
+                    <p className="text-sm text-muted-foreground">
+                      {cp.contactPhone}
+                    </p>
+                  )}
                   {cp.websiteUrl && (
                     <a
                       href={cp.websiteUrl}
@@ -386,13 +403,13 @@ export function ProfilePage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Title / Role</Label>
+                    <Label>Expertise</Label>
                     <Input
-                      data-ocid="profile.edit.title.input"
-                      value={mentor.title}
+                      data-ocid="profile.edit.expertise.input"
+                      value={mentor.expertise}
                       onChange={(e) =>
                         setMentor((p) =>
-                          p ? { ...p, title: e.target.value } : p,
+                          p ? { ...p, expertise: e.target.value, title: e.target.value } : p,
                         )
                       }
                       required
@@ -565,17 +582,32 @@ export function ProfilePage() {
                     />
                   </div>
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Availability</Label>
-                  <Input
-                    data-ocid="profile.edit.availability.input"
-                    value={mentor.availability}
-                    onChange={(e) =>
-                      setMentor((p) =>
-                        p ? { ...p, availability: e.target.value } : p,
-                      )
-                    }
-                  />
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label>Availability</Label>
+                    <Input
+                      data-ocid="profile.edit.availability.input"
+                      value={mentor.availability}
+                      onChange={(e) =>
+                        setMentor((p) =>
+                          p ? { ...p, availability: e.target.value } : p,
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Phone Number</Label>
+                    <Input
+                      type="tel"
+                      data-ocid="profile.edit.phone.input"
+                      value={mentor.phone}
+                      onChange={(e) =>
+                        setMentor((p) =>
+                          p ? { ...p, phone: e.target.value } : p,
+                        )
+                      }
+                    />
+                  </div>
                 </div>
               </>
             )}
@@ -667,7 +699,7 @@ export function ProfilePage() {
                     />
                   </div>
                 </div>
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-3 gap-4">
                   <div className="space-y-1.5">
                     <Label>Contact Name</Label>
                     <Input
@@ -689,6 +721,19 @@ export function ProfilePage() {
                       onChange={(e) =>
                         setCompany((p) =>
                           p ? { ...p, contactEmail: e.target.value } : p,
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Contact Phone</Label>
+                    <Input
+                      type="tel"
+                      data-ocid="profile.edit.contact_phone.input"
+                      value={company.contactPhone}
+                      onChange={(e) =>
+                        setCompany((p) =>
+                          p ? { ...p, contactPhone: e.target.value } : p,
                         )
                       }
                     />

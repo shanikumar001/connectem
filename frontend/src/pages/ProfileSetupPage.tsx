@@ -20,6 +20,7 @@ export function ProfileSetupPage() {
 
   const [mentor, setMentor] = useState<MentorProfile>({
     fullName: user?.mentorProfile?.fullName ?? "",
+    expertise: user?.mentorProfile?.expertise ?? "",
     title: user?.mentorProfile?.title ?? "",
     bio: user?.mentorProfile?.bio ?? "",
     yearsExperience: user?.mentorProfile?.yearsExperience ?? 0,
@@ -29,6 +30,7 @@ export function ProfileSetupPage() {
     websiteUrl: user?.mentorProfile?.websiteUrl ?? "",
     location: user?.mentorProfile?.location ?? "",
     availability: user?.mentorProfile?.availability ?? "",
+    phone: user?.mentorProfile?.phone ?? "",
   });
 
   const [company, setCompany] = useState<CompanyProfile>({
@@ -39,6 +41,7 @@ export function ProfileSetupPage() {
     mentorRequirements: user?.companyProfile?.mentorRequirements ?? "",
     contactName: user?.companyProfile?.contactName ?? "",
     contactEmail: user?.companyProfile?.contactEmail ?? "",
+    contactPhone: user?.companyProfile?.contactPhone ?? "",
     websiteUrl: user?.companyProfile?.websiteUrl ?? "",
     location: user?.companyProfile?.location ?? "",
   });
@@ -112,14 +115,14 @@ export function ProfileSetupPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="title">Title / Role *</Label>
+                  <Label htmlFor="expertise">Expertise *</Label>
                   <Input
-                    id="title"
-                    data-ocid="profile_setup.title.input"
-                    placeholder="Senior Engineering Manager"
-                    value={mentor.title}
+                    id="expertise"
+                    data-ocid="profile_setup.expertise.input"
+                    placeholder="e.g. Software Architecture, Product Growth"
+                    value={mentor.expertise}
                     onChange={(e) =>
-                      setMentor((p) => ({ ...p, title: e.target.value }))
+                      setMentor((p) => ({ ...p, expertise: e.target.value, title: e.target.value }))
                     }
                     required
                   />
@@ -300,17 +303,32 @@ export function ProfileSetupPage() {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="availability">Availability</Label>
-                <Input
-                  id="availability"
-                  data-ocid="profile_setup.availability.input"
-                  placeholder="e.g. Available 2 hrs/week, Wednesdays preferred"
-                  value={mentor.availability}
-                  onChange={(e) =>
-                    setMentor((p) => ({ ...p, availability: e.target.value }))
-                  }
-                />
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="availability">Availability</Label>
+                  <Input
+                    id="availability"
+                    data-ocid="profile_setup.availability.input"
+                    placeholder="e.g. 2 hrs/week"
+                    value={mentor.availability}
+                    onChange={(e) =>
+                      setMentor((p) => ({ ...p, availability: e.target.value }))
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    data-ocid="profile_setup.phone.input"
+                    placeholder="+1 (555) 000-0000"
+                    value={mentor.phone}
+                    onChange={(e) =>
+                      setMentor((p) => ({ ...p, phone: e.target.value }))
+                    }
+                  />
+                </div>
               </div>
             </>
           ) : (
@@ -408,7 +426,7 @@ export function ProfileSetupPage() {
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="contactName">Contact Name *</Label>
                   <Input
@@ -435,6 +453,21 @@ export function ProfileSetupPage() {
                       }))
                     }
                     required
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="contactPhone">Contact Phone</Label>
+                  <Input
+                    id="contactPhone"
+                    type="tel"
+                    data-ocid="profile_setup.contact_phone.input"
+                    value={company.contactPhone}
+                    onChange={(e) =>
+                      setCompany((p) => ({
+                        ...p,
+                        contactPhone: e.target.value,
+                      }))
+                    }
                   />
                 </div>
               </div>

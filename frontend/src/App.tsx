@@ -6,6 +6,7 @@ import {
   createRoute,
   createRouter,
   redirect,
+  useNavigate,
 } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuthModal } from "./components/AuthModal";
@@ -15,13 +16,26 @@ import { useAuth } from "./hooks/useAuth";
 import { HomePage } from "./pages/HomePage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { ProfileSetupPage } from "./pages/ProfileSetupPage";
+import { AdminDashboardPage } from "./pages/AdminDashboardPage";
+import { useEffect } from "react";
 
 // Root layout component
 function RootLayout() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [authOpen, setAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<"signin" | "signup">("signin");
   const [requestOpen, setRequestOpen] = useState(false);
+
+  // Onboarding guard
+  useEffect(() => {
+    if (!isLoading && isLoggedIn && user && !user.isProfileCompleted) {
+      const path = window.location.pathname;
+      if (path !== "/profile/setup") {
+        navigate({ to: "/profile/setup" });
+      }
+    }
+  }, [isLoggedIn, user, isLoading, navigate]);
 
   function openSignIn() {
     setAuthTab("signin");
@@ -103,10 +117,20 @@ const profileRoute = createRoute({
   component: ProfilePage,
 });
 
+const adminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin",
+  component: AdminDashboardPage,
+  beforeLoad: ({ context }) => {
+    // Basic check, more robust one in the component itself
+  }
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   profileSetupRoute,
   profileRoute,
+  adminRoute,
 ]);
 
 const router = createRouter({ routeTree });

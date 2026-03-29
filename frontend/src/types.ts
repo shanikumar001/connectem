@@ -5,6 +5,7 @@ export enum UserRole {
 
 export interface MentorProfile {
   fullName: string;
+  expertise: string;
   title: string;
   bio: string;
   yearsExperience: number;
@@ -14,6 +15,7 @@ export interface MentorProfile {
   websiteUrl: string;
   location: string;
   availability: string;
+  phone: string;
 }
 
 export interface CompanyProfile {
@@ -24,6 +26,7 @@ export interface CompanyProfile {
   mentorRequirements: string;
   contactName: string;
   contactEmail: string;
+  contactPhone: string;
   websiteUrl: string;
   location: string;
 }
@@ -33,6 +36,8 @@ export interface UserProfile {
   email: string;
   role: UserRole;
   isAdmin: boolean;
+  isProfileCompleted: boolean;
+  isApproved: boolean;
   mentorProfile?: MentorProfile | null;
   companyProfile?: CompanyProfile | null;
   createdAt: string;

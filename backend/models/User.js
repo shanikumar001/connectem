@@ -4,6 +4,7 @@ const crypto = require('crypto');
 
 const mentorProfileSchema = new mongoose.Schema({
   fullName: { type: String, default: '' },
+  expertise: { type: String, default: '' },
   title: { type: String, default: '' },
   bio: { type: String, default: '' },
   yearsExperience: { type: Number, default: 0 },
@@ -13,6 +14,7 @@ const mentorProfileSchema = new mongoose.Schema({
   websiteUrl: { type: String, default: '' },
   location: { type: String, default: '' },
   availability: { type: String, default: '' },
+  phone: { type: String, default: '' },
 }, { _id: false });
 
 const companyProfileSchema = new mongoose.Schema({
@@ -23,6 +25,7 @@ const companyProfileSchema = new mongoose.Schema({
   mentorRequirements: { type: String, default: '' },
   contactName: { type: String, default: '' },
   contactEmail: { type: String, default: '' },
+  contactPhone: { type: String, default: '' },
   websiteUrl: { type: String, default: '' },
   location: { type: String, default: '' },
 }, { _id: false });
@@ -46,6 +49,14 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  isProfileCompleted: {
+    type: Boolean,
+    default: false,
+  },
+  isApproved: {
     type: Boolean,
     default: false,
   },

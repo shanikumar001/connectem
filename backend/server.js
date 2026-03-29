@@ -68,8 +68,36 @@ app.get('/api/health', (req, res) => {
 // Connect to MongoDB and start server
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => {
+  .then(async () => {
     console.log('✅ Connected to MongoDB');
+    
+    // Seed admin user
+    const User = require('./models/User');
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (adminEmail && adminPassword) {
+      try {
+        const existingAdmin = await User.findOne({ email: adminEmail.toLowerCase() });
+        if (!existingAdmin) {
+          const admin = new User({
+            email: adminEmail,
+            password: adminPassword,
+            role: 'mentor',
+            isAdmin: true,
+            isProfileCompleted: true,
+            isApproved: true,
+          });
+          await admin.save();
+          console.log('✅ Admin user created:', adminEmail);
+        } else {
+          console.log('ℹ️ Admin user already exists:', adminEmail);
+        }
+      } catch (error) {
+        console.error('❌ Error seeding admin user:', error.message);
+      }
+    }
+
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
     });

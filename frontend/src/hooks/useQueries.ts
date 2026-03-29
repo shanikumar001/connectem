@@ -76,4 +76,60 @@ export function useSubmitRequestAccess() {
   });
 }
 
+// Admin Hooks
+export function useUsers() {
+  const { user } = useAuth();
+  return useQuery<UserProfile[]>({
+    queryKey: ["admin", "users"],
+    queryFn: async () => {
+      const data = await apiFetch<{ users: UserProfile[] }>("/api/users");
+      return data.users;
+    },
+    enabled: !!user?.isAdmin,
+  });
+}
+
+export function useUpdateUserAdmin() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<UserProfile> }) => {
+      await apiFetch(`/api/users/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+    },
+  });
+}
+
+export function useApproveUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await apiFetch(`/api/users/${id}/approve`, {
+        method: "POST",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+    },
+  });
+}
+
+export function useDeleteUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await apiFetch(`/api/users/${id}`, {
+        method: "DELETE",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+    },
+  });
+}
+
 export type { UserRole };

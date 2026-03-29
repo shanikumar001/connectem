@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "@tanstack/react-router";
-import { ChevronDown, LogOut, Menu, User, X } from "lucide-react";
+import { ChevronDown, LayoutDashboard, LogOut, Menu, User, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 
@@ -120,6 +120,18 @@ export function Navbar({ onRequestAccess, onSignIn }: NavbarProps) {
                     View Profile
                   </Link>
                 </DropdownMenuItem>
+                {user?.isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/admin"
+                      data-ocid="nav.admin_dashboard.link"
+                      className="cursor-pointer flex items-center gap-2"
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={logout}
@@ -190,6 +202,15 @@ export function Navbar({ onRequestAccess, onSignIn }: NavbarProps) {
                 >
                   View Profile
                 </Link>
+                {user?.isAdmin && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileOpen(false)}
+                    className="text-sm text-center hover:underline"
+                  >
+                    Admin Dashboard
+                  </Link>
+                )}
                 <button
                   type="button"
                   onClick={() => {

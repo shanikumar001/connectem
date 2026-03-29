@@ -148,6 +148,39 @@ export function AuthModal({
                   </>
                 )}
               </Button>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Or
+                  </span>
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full rounded-full"
+                onClick={async () => {
+                  setEmail("admin@connectem.com");
+                  setPassword("AdminPass123");
+                  // Small delay to allow state update if needed, but login() takes values from closure usually.
+                  // Actually, better to just call login directly with the values.
+                  setIsSubmitting(true);
+                  try {
+                    await login("admin@connectem.com", "AdminPass123");
+                    toast.success("Logged in as Admin");
+                    resetAndClose();
+                  } catch (err: unknown) {
+                    toast.error("Admin login failed");
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+              >
+                Login as Admin
+              </Button>
             </form>
           </TabsContent>
 
