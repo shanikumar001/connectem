@@ -20,9 +20,34 @@ router.put('/', auth, async (req, res) => {
     const user = req.user;
 
     if (user.role === 'mentor' && mentorProfile) {
-      user.mentorProfile = mentorProfile;
+      const allowedMentor = {
+        fullName: mentorProfile.fullName || '',
+        title: mentorProfile.title || '',
+        bio: mentorProfile.bio || '',
+        yearsExperience: Number(mentorProfile.yearsExperience || 0),
+        skills: Array.isArray(mentorProfile.skills) ? mentorProfile.skills : [],
+        industries: Array.isArray(mentorProfile.industries) ? mentorProfile.industries : [],
+        linkedinUrl: mentorProfile.linkedinUrl || '',
+        websiteUrl: mentorProfile.websiteUrl || '',
+        location: mentorProfile.location || '',
+        availability: mentorProfile.availability || '',
+      };
+      user.mentorProfile = allowedMentor;
     } else if (user.role === 'company' && companyProfile) {
-      user.companyProfile = companyProfile;
+      const allowedCompany = {
+        companyName: companyProfile.companyName || '',
+        industry: companyProfile.industry || '',
+        description: companyProfile.description || '',
+        teamSize: Number(companyProfile.teamSize || 0),
+        mentorRequirements: companyProfile.mentorRequirements || '',
+        contactName: companyProfile.contactName || '',
+        contactEmail: companyProfile.contactEmail || '',
+        websiteUrl: companyProfile.websiteUrl || '',
+        location: companyProfile.location || '',
+      };
+      user.companyProfile = allowedCompany;
+    } else {
+      return res.status(400).json({ error: 'Invalid profile payload for current role' });
     }
 
     await user.save();

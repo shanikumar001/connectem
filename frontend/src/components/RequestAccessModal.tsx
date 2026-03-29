@@ -38,11 +38,21 @@ export function RequestAccessModal({ open, onClose }: RequestAccessModalProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!form.roleInterest) {
+      toast.error("Please select your role.");
+      return;
+    }
+    if (form.message.trim().length < 20) {
+      toast.error("Message must be at least 20 characters.");
+      return;
+    }
     try {
       await mutateAsync(form);
       setSubmitted(true);
-    } catch {
-      toast.error("Failed to submit. Please try again.");
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to submit. Please try again.",
+      );
     }
   }
 
@@ -152,7 +162,11 @@ export function RequestAccessModal({ open, onClose }: RequestAccessModalProps) {
                   setForm((p) => ({ ...p, message: e.target.value }))
                 }
                 required
+                minLength={20}
               />
+              <p className="text-xs text-muted-foreground">
+                Minimum 20 characters.
+              </p>
             </div>
             <Button
               type="submit"

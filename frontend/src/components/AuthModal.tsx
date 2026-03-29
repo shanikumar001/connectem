@@ -171,11 +171,11 @@ export function AuthModal({
                   id="signup-password"
                   type="password"
                   data-ocid="auth.signup.password.input"
-                  placeholder="Min. 6 characters"
+                  placeholder="Min. 8 chars, 1 uppercase, 1 number"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  minLength={6}
+                  minLength={8}
                 />
               </div>
               <div className="space-y-1.5">

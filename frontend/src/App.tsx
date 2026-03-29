@@ -11,12 +11,14 @@ import { useState } from "react";
 import { AuthModal } from "./components/AuthModal";
 import { Navbar } from "./components/Navbar";
 import { RequestAccessModal } from "./components/RequestAccessModal";
+import { useAuth } from "./hooks/useAuth";
 import { HomePage } from "./pages/HomePage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { ProfileSetupPage } from "./pages/ProfileSetupPage";
 
 // Root layout component
 function RootLayout() {
+  const { isLoggedIn } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<"signin" | "signup">("signin");
   const [requestOpen, setRequestOpen] = useState(false);
@@ -26,6 +28,11 @@ function RootLayout() {
     setAuthOpen(true);
   }
   function openRequestAccess() {
+    if (!isLoggedIn) {
+      setAuthTab("signin");
+      setAuthOpen(true);
+      return;
+    }
     setRequestOpen(true);
   }
 
@@ -54,13 +61,21 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: function Index() {
+    const { isLoggedIn } = useAuth();
     const [authOpen, setAuthOpen] = useState(false);
     const [requestOpen, setRequestOpen] = useState(false);
     return (
       <>
         <HomePage
-          onRequestAccess={() => setRequestOpen(true)}
+          onRequestAccess={() => {
+            if (!isLoggedIn) {
+              setAuthOpen(true);
+              return;
+            }
+            setRequestOpen(true);
+          }}
           onSignIn={() => setAuthOpen(true)}
+          isLoggedIn={isLoggedIn}
         />
         <AuthModal
           open={authOpen}

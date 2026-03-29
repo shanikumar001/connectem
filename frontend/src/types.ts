@@ -40,7 +40,7 @@ export interface UserProfile {
 }
 
 export interface AuthResponse {
-  token: string;
+  accessToken: string;
   user: UserProfile;
 }
 
