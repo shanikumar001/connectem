@@ -14,8 +14,8 @@ interface HomePageProps {
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: { duration: 0.8, ease: [0.21, 0.45, 0.32, 0.9] as [number, number, number, number] }
   }
@@ -31,77 +31,107 @@ const staggerContainer = {
   }
 };
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const charVariants = {
+  hidden: { opacity: 0, y: 10, display: "inline-block" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: "easeOut" as any },
+  },
+};
+
 export function HomePage({ onRequestAccess, onSignIn, isLoggedIn }: HomePageProps) {
   const { data: mentors } = useSelectedMentors();
   const featuredMentors = mentors?.slice(0, 3) || [];
 
+  const renderTypewriterText = (text: string, className?: string) => {
+    return text.split("").map((char, i) => (
+      <motion.span
+        key={`${text}-${i}`}
+        variants={charVariants}
+        className={className}
+      >
+        {char === " " ? "\u00A0" : char}
+      </motion.span>
+    ));
+  };
+
   return (
     <main className="overflow-x-hidden">
       {/* HERO */}
-      <section className="max-w-[1200px] mx-auto px-4 sm:px-6 pt-20 pb-24 lg:pt-28 lg:pb-32">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.9, ease: [0.21, 0.45, 0.32, 0.9] as [number, number, number, number] }}
-          >
-            <Badge variant="outline" className="mb-6 px-4 py-1 rounded-full text-foreground/60 border-foreground/10 uppercase tracking-widest text-[10px] bg-background/50 backdrop-blur-sm shadow-sm">
-              Private Mentor Staffing
-            </Badge>
-            <h1 className="font-serif text-[clamp(2.4rem,5vw,4.5rem)] leading-[1.05] text-foreground mb-6 tracking-tight">
-              Mentors are placed,
-              <br />
-              <span className="text-muted-foreground/60">not discovered.</span>
-            </h1>
-            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-[480px] mb-10">
-              ConnectEm is a controlled, admin-managed platform for placing
-              verified industry mentors with teams and institutions — without
-              public listings or exposure.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Button
-                onClick={onRequestAccess}
-                className="rounded-full bg-foreground text-primary-foreground hover:bg-foreground/85 px-8 py-6 text-sm font-medium shadow-lg shadow-foreground/10 transition-all hover:scale-105 active:scale-95"
-              >
-                Request Access
-              </Button>
-              {!isLoggedIn && (
-                <Button
-                  variant="outline"
-                  onClick={onSignIn}
-                  className="rounded-full border-foreground/10 hover:border-foreground/30 text-foreground px-8 py-6 text-sm font-medium transition-all hover:bg-muted"
-                >
-                  Existing account <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          </motion.div>
+      <section className="relative max-w-[1200px] mx-auto px-4 sm:px-6 pt-24 pb-28 lg:pt-36 lg:pb-44 flex flex-col items-center text-center overflow-hidden">
+        {/* Subtle Background Glows */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[500px] bg-gradient-to-b from-emerald-500/[0.03] to-transparent blur-3xl rounded-full -z-10" />
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-500/[0.02] blur-3xl rounded-full -z-10" />
+        <div className="absolute top-48 -right-24 w-96 h-96 bg-emerald-500/[0.02] blur-3xl rounded-full -z-10" />
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, x: 30 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            transition={{ duration: 1.1, ease: [0.21, 0.45, 0.32, 1] as [number, number, number, number], delay: 0.2 }}
-            className="hidden lg:block relative"
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="max-w-4xl"
+        >
+          <Badge variant="outline" className="mb-8 px-5 py-1.5 rounded-full text-foreground/60 border-foreground/10 uppercase tracking-[0.2em] text-[10px] bg-background/50 backdrop-blur-md shadow-sm">
+            Private Mentor Staffing
+          </Badge>
+          
+          <h1 
+            className="font-serif text-[clamp(2.8rem,7vw,5.5rem)] leading-[1.02] text-foreground mb-8 tracking-tighter"
+            aria-label="Mentors are placed, not discovered."
           >
-            <div className="absolute -inset-4 bg-gradient-to-tr from-emerald-500/10 to-blue-500/10 blur-2xl rounded-full" />
-            <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10 aspect-[4/3]">
-              <img
-                src="./src/assets/connect_em.jpg"
-                alt="Professional mentor placement"
-                className="w-full h-full object-cover grayscale-[20%] sepia-[10%] hover:scale-105 transition-transform duration-[2s] ease-out"
-              />
-            </div>
-          </motion.div>
-        </div>
+            {renderTypewriterText("Mentors are ")}
+            <span className="text-muted-foreground/40 italic">
+              {renderTypewriterText("placed")}
+            </span>
+            {renderTypewriterText(", ")}
+            <br />
+            {renderTypewriterText("not discovered.")}
+          </h1>
+          
+          <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-12 font-light">
+            ConnectEm is a controlled, admin-managed platform for placing
+            verified industry mentors with teams and institutional partners — 
+            without public listings or exposure.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+            <Button
+              onClick={onRequestAccess}
+              className="rounded-full bg-foreground text-primary-foreground hover:bg-foreground/85 px-10 py-7 text-base font-medium shadow-2xl shadow-foreground/20 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto"
+            >
+              Request Access Now
+            </Button>
+            {!isLoggedIn && (
+              <Button
+                variant="ghost"
+                onClick={onSignIn}
+                className="rounded-full text-muted-foreground hover:text-foreground px-8 py-7 text-base font-medium transition-all group"
+              >
+                Existing account <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+              </Button>
+            )}
+          </div>
+        </motion.div>
       </section>
 
       {/* PHILOSOPHY STRIP */}
-      <motion.section 
-        id="philosophy" 
+      <motion.section
+        id="philosophy"
         className="border-y border-border bg-muted/30 backdrop-blur-sm"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
+        viewport={{ once: false, margin: "-100px" }}
         variants={sectionVariants}
       >
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-16">
@@ -120,11 +150,11 @@ export function HomePage({ onRequestAccess, onSignIn, isLoggedIn }: HomePageProp
         id="how-it-works"
         className="max-w-[1200px] mx-auto px-4 sm:px-6 py-24 lg:py-32"
       >
-        <motion.div 
+        <motion.div
           className="text-center mb-16"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: false }}
           variants={sectionVariants}
         >
           <Badge variant="outline" className="mb-4 text-[10px] tracking-widest uppercase text-muted-foreground/60 border-none">
@@ -135,11 +165,11 @@ export function HomePage({ onRequestAccess, onSignIn, isLoggedIn }: HomePageProp
           </h2>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="grid md:grid-cols-3 gap-8"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: false }}
           variants={staggerContainer}
         >
           {[
@@ -190,11 +220,11 @@ export function HomePage({ onRequestAccess, onSignIn, isLoggedIn }: HomePageProp
       {featuredMentors.length > 0 && (
         <section className="bg-muted/30 border-y border-border overflow-hidden">
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-24 lg:py-32">
-            <motion.div 
+            <motion.div
               className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16"
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               variants={sectionVariants}
             >
               <div className="max-w-xl">
@@ -213,11 +243,11 @@ export function HomePage({ onRequestAccess, onSignIn, isLoggedIn }: HomePageProp
               </Button>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               variants={staggerContainer}
             >
               {featuredMentors.map((user, i) => (
@@ -231,11 +261,11 @@ export function HomePage({ onRequestAccess, onSignIn, isLoggedIn }: HomePageProp
       {/* TRUST SECTION */}
       <section id="trust" className="bg-foreground text-primary-foreground overflow-hidden">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-24 lg:py-32">
-          <motion.div 
+          <motion.div
             className="max-w-3xl mx-auto text-center mb-20"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: false }}
             variants={sectionVariants}
           >
             <Badge variant="outline" className="mb-6 px-4 py-1 rounded-full text-primary-foreground/40 border-primary-foreground/10 uppercase tracking-widest text-[10px]">
@@ -252,11 +282,11 @@ export function HomePage({ onRequestAccess, onSignIn, isLoggedIn }: HomePageProp
             </p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className="grid sm:grid-cols-3 gap-8"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: false }}
             variants={staggerContainer}
           >
             {[
@@ -297,12 +327,12 @@ export function HomePage({ onRequestAccess, onSignIn, isLoggedIn }: HomePageProp
         className="max-w-[1200px] mx-auto px-4 sm:px-6 py-24 lg:py-40 text-center relative overflow-hidden"
       >
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03)_0%,transparent_70%)] pointer-events-none" />
-        
-        <motion.div 
+
+        <motion.div
           className="max-w-2xl mx-auto relative z-10"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: false }}
           variants={sectionVariants}
         >
           <h2 className="font-serif text-[clamp(2rem,4vw,3.2rem)] text-foreground mb-8 tracking-tighter leading-[1.1]">
@@ -328,7 +358,7 @@ export function HomePage({ onRequestAccess, onSignIn, isLoggedIn }: HomePageProp
             <div className="h-8 w-8 rounded-xl bg-foreground flex items-center justify-center font-serif font-bold text-lg text-primary-foreground">CE</div>
             <span className="font-medium text-foreground tracking-tight">ConnectEm Managed Mentorship</span>
           </div>
-          
+
           <div className="flex items-center gap-8">
             <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>
