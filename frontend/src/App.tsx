@@ -16,7 +16,9 @@ import { useAuth } from "./hooks/useAuth";
 import { HomePage } from "./pages/HomePage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { ProfileSetupPage } from "./pages/ProfileSetupPage";
-import { AdminDashboardPage } from "./pages/AdminDashboardPage";
+import { AdminDashboardPage } from "@/pages/AdminDashboardPage";
+import { DashboardPage } from "@/pages/DashboardPage";
+import { MentorsPage } from "@/pages/MentorsPage";
 import { useEffect } from "react";
 
 // Root layout component
@@ -121,9 +123,18 @@ const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/admin",
   component: AdminDashboardPage,
-  beforeLoad: ({ context }) => {
-    // Basic check, more robust one in the component itself
-  }
+});
+
+const dashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/dashboard",
+  component: DashboardPage,
+});
+
+const mentorsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/mentors",
+  component: MentorsPage,
 });
 
 const routeTree = rootRoute.addChildren([
@@ -131,6 +142,8 @@ const routeTree = rootRoute.addChildren([
   profileSetupRoute,
   profileRoute,
   adminRoute,
+  dashboardRoute,
+  mentorsRoute,
 ]);
 
 const router = createRouter({ routeTree });

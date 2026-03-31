@@ -33,6 +33,7 @@ router.put('/', auth, async (req, res) => {
         location: mentorProfile.location || '',
         availability: mentorProfile.availability || '',
         phone: mentorProfile.phone || '',
+        profileImage: mentorProfile.profileImage || '',
       };
       user.mentorProfile = allowedMentor;
       // Mark as completed if mandatory fields are present
@@ -51,6 +52,7 @@ router.put('/', auth, async (req, res) => {
         contactPhone: companyProfile.contactPhone || '',
         websiteUrl: companyProfile.websiteUrl || '',
         location: companyProfile.location || '',
+        profileImage: companyProfile.profileImage || '',
       };
       user.companyProfile = allowedCompany;
       // Mark as completed if mandatory fields are present

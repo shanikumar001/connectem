@@ -31,6 +31,7 @@ export function ProfileSetupPage() {
     location: user?.mentorProfile?.location ?? "",
     availability: user?.mentorProfile?.availability ?? "",
     phone: user?.mentorProfile?.phone ?? "",
+    profileImage: user?.mentorProfile?.profileImage ?? "",
   });
 
   const [company, setCompany] = useState<CompanyProfile>({
@@ -44,6 +45,7 @@ export function ProfileSetupPage() {
     contactPhone: user?.companyProfile?.contactPhone ?? "",
     websiteUrl: user?.companyProfile?.websiteUrl ?? "",
     location: user?.companyProfile?.location ?? "",
+    profileImage: user?.companyProfile?.profileImage ?? "",
   });
 
   const [skillInput, setSkillInput] = useState("");
@@ -76,7 +78,7 @@ export function ProfileSetupPage() {
         companyProfile: role === UserRole.company ? company : undefined,
       });
       toast.success("Profile saved!");
-      navigate({ to: "/profile" });
+      navigate({ to: "/dashboard" });
     } catch {
       toast.error("Failed to save profile.");
     }
@@ -303,6 +305,19 @@ export function ProfileSetupPage() {
                 </div>
               </div>
 
+              <div className="space-y-1.5">
+                <Label htmlFor="mentorAvatar">Profile Image URL</Label>
+                <Input
+                  id="mentorAvatar"
+                  type="url"
+                  placeholder="https://images.unsplash.com/…"
+                  value={mentor.profileImage}
+                  onChange={(e) =>
+                    setMentor((p) => ({ ...p, profileImage: e.target.value }))
+                  }
+                />
+              </div>
+
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="availability">Availability</Label>
@@ -482,6 +497,19 @@ export function ProfileSetupPage() {
                   value={company.websiteUrl}
                   onChange={(e) =>
                     setCompany((p) => ({ ...p, websiteUrl: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="companyAvatar">Profile Image URL</Label>
+                <Input
+                  id="companyAvatar"
+                  type="url"
+                  placeholder="https://images.unsplash.com/…"
+                  value={company.profileImage}
+                  onChange={(e) =>
+                    setCompany((p) => ({ ...p, profileImage: e.target.value }))
                   }
                 />
               </div>

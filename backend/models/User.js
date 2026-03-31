@@ -15,6 +15,7 @@ const mentorProfileSchema = new mongoose.Schema({
   location: { type: String, default: '' },
   availability: { type: String, default: '' },
   phone: { type: String, default: '' },
+  profileImage: { type: String, default: '' },
 }, { _id: false });
 
 const companyProfileSchema = new mongoose.Schema({
@@ -28,6 +29,7 @@ const companyProfileSchema = new mongoose.Schema({
   contactPhone: { type: String, default: '' },
   websiteUrl: { type: String, default: '' },
   location: { type: String, default: '' },
+  profileImage: { type: String, default: '' },
 }, { _id: false });
 
 const userSchema = new mongoose.Schema({
@@ -59,6 +61,11 @@ const userSchema = new mongoose.Schema({
   isApproved: {
     type: Boolean,
     default: false,
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'interview', 'pass', 'selected'],
+    default: 'pending',
   },
   mentorProfile: {
     type: mentorProfileSchema,

@@ -6,6 +6,7 @@ import type {
   MentorProfile,
   UserProfile,
   UserRole,
+  UserStatus,
 } from "../types";
 
 export function useUserProfile() {
@@ -128,6 +129,43 @@ export function useDeleteUser() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+    },
+  });
+}
+
+export function useUpdateUserStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: UserStatus }) => {
+      await apiFetch(`/api/users/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+    },
+  });
+}
+
+export function useDirectoryUsers() {
+  const { isLoggedIn } = useAuth();
+  return useQuery<UserProfile[]>({
+    queryKey: ["directory", "users"],
+    queryFn: async () => {
+      const data = await apiFetch<{ users: UserProfile[] }>("/api/users/directory");
+      return data.users;
+    },
+    enabled: isLoggedIn,
+  });
+}
+
+export function useSelectedMentors() {
+  return useQuery<UserProfile[]>({
+    queryKey: ["public", "selectedMentors"],
+    queryFn: async () => {
+      const data = await apiFetch<{ users: UserProfile[] }>("/api/users/public/selected");
+      return data.users;
     },
   });
 }

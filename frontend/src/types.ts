@@ -3,6 +3,13 @@ export enum UserRole {
   company = "company",
 }
 
+export enum UserStatus {
+  pending = "pending",
+  interview = "interview",
+  pass = "pass",
+  selected = "selected",
+}
+
 export interface MentorProfile {
   fullName: string;
   expertise: string;
@@ -16,6 +23,7 @@ export interface MentorProfile {
   location: string;
   availability: string;
   phone: string;
+  profileImage: string;
 }
 
 export interface CompanyProfile {
@@ -29,6 +37,7 @@ export interface CompanyProfile {
   contactPhone: string;
   websiteUrl: string;
   location: string;
+  profileImage: string;
 }
 
 export interface UserProfile {
@@ -38,6 +47,7 @@ export interface UserProfile {
   isAdmin: boolean;
   isProfileCompleted: boolean;
   isApproved: boolean;
+  status: UserStatus;
   mentorProfile?: MentorProfile | null;
   companyProfile?: CompanyProfile | null;
   createdAt: string;

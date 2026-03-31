@@ -22,13 +22,13 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
-import { useApproveUser, useDeleteUser, useUsers } from "../hooks/useQueries";
-import { UserRole, type UserProfile } from "../types";
+import { useUpdateUserStatus, useDeleteUser, useUsers } from "../hooks/useQueries";
+import { UserRole, UserStatus, type UserProfile } from "../types";
 
 export function AdminDashboardPage() {
   const { user: currentUser } = useAuth();
   const { data: users, isLoading } = useUsers();
-  const { mutateAsync: approveUser } = useApproveUser();
+  const { mutateAsync: updateStatus } = useUpdateUserStatus();
   const { mutateAsync: deleteUser } = useDeleteUser();
 
   const [search, setSearch] = useState("");
@@ -62,12 +62,12 @@ export function AdminDashboardPage() {
           .includes(search.toLowerCase()),
     );
 
-  async function handleApprove(id: string) {
+  async function handleUpdateStatus(id: string, status: UserStatus) {
     try {
-      await approveUser(id);
-      toast.success("User approved!");
+      await updateStatus({ id, status });
+      toast.success(`User marked as ${status}`);
     } catch {
-      toast.error("Failed to approve user.");
+      toast.error("Failed to update status.");
     }
   }
 
@@ -113,7 +113,7 @@ export function AdminDashboardPage() {
             <UserTable
               users={filterUsers(mentors)}
               onView={setSelectedUser}
-              onApprove={handleApprove}
+              onUpdateStatus={handleUpdateStatus}
               onDelete={handleDelete}
             />
           </TabsContent>
@@ -122,7 +122,7 @@ export function AdminDashboardPage() {
             <UserTable
               users={filterUsers(companies)}
               onView={setSelectedUser}
-              onApprove={handleApprove}
+              onUpdateStatus={handleUpdateStatus}
               onDelete={handleDelete}
             />
           </TabsContent>
@@ -133,7 +133,7 @@ export function AdminDashboardPage() {
         user={selectedUser}
         open={!!selectedUser}
         onClose={() => setSelectedUser(null)}
-        onApprove={handleApprove}
+        onUpdateStatus={handleUpdateStatus}
         onDelete={handleDelete}
       />
     </div>
@@ -143,12 +143,12 @@ export function AdminDashboardPage() {
 function UserTable({
   users,
   onView,
-  onApprove,
+  onUpdateStatus,
   onDelete,
 }: {
   users: UserProfile[];
   onView: (u: UserProfile) => void;
-  onApprove: (id: string) => void;
+  onUpdateStatus: (id: string, status: UserStatus) => void;
   onDelete: (id: string) => void;
 }) {
   if (users.length === 0) {
@@ -198,11 +198,7 @@ function UserTable({
                       <Badge variant={isComplete ? "secondary" : "outline"} className="text-[10px] px-1.5 py-0">
                         {isComplete ? "Profile Complete" : "Incomplete"}
                       </Badge>
-                      {isApproved && (
-                        <Badge variant="default" className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 border-emerald-200 text-[10px] px-1.5 py-0">
-                          Approved
-                        </Badge>
-                      )}
+                      <StatusBadge status={u.status} />
                     </div>
                   </td>
                   <td className="px-6 py-4 text-xs text-muted-foreground">
@@ -210,19 +206,6 @@ function UserTable({
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {!isApproved && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onApprove(u._id);
-                          }}
-                        >
-                          <UserCheck className="h-4 w-4" />
-                        </Button>
-                      )}
                       <Button
                         variant="ghost"
                         size="icon"
@@ -251,13 +234,13 @@ function UserDetailModal({
   user,
   open,
   onClose,
-  onApprove,
+  onUpdateStatus,
   onDelete,
 }: {
   user: UserProfile | null;
   open: boolean;
   onClose: () => void;
-  onApprove: (id: string) => void;
+  onUpdateStatus: (id: string, status: UserStatus) => void;
   onDelete: (id: string) => void;
 }) {
   if (!user) return null;
@@ -314,22 +297,49 @@ function UserDetailModal({
             )}
           </div>
 
-          <div className="pt-6 border-t flex flex-wrap gap-3 items-center justify-between">
-            <div className="flex gap-3">
-              {!user.isApproved && (
+          <div className="pt-6 border-t flex flex-col gap-4">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Update Status</p>
+            <div className="flex flex-wrap gap-3 items-center justify-between">
+              <div className="flex flex-wrap gap-2">
                 <Button
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-full gap-2"
+                  size="sm"
+                  variant={user.status === UserStatus.interview ? "default" : "outline"}
+                  className="rounded-full"
                   onClick={() => {
-                    onApprove(user._id);
+                    onUpdateStatus(user._id, UserStatus.interview);
                     onClose();
                   }}
                 >
-                  <CheckCircle2 className="h-4 w-4" /> Approve User
+                  Interview
                 </Button>
-              )}
+                <Button
+                  size="sm"
+                  variant={user.status === UserStatus.pass ? "default" : "outline"}
+                  className="rounded-full"
+                  onClick={() => {
+                    onUpdateStatus(user._id, UserStatus.pass);
+                    onClose();
+                  }}
+                >
+                  Pass
+                </Button>
+                <Button
+                  size="sm"
+                  variant={user.status === UserStatus.selected ? "default" : "outline"}
+                  className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white border-none"
+                  onClick={() => {
+                    onUpdateStatus(user._id, UserStatus.selected);
+                    onClose();
+                  }}
+                >
+                  <UserCheck className="mr-2 h-4 w-4" /> Selected
+                </Button>
+              </div>
+              
               <Button
-                variant="outline"
-                className="rounded-full text-destructive border-destructive/20 hover:bg-destructive/5"
+                variant="ghost"
+                size="sm"
+                className="text-destructive hover:bg-destructive/5 rounded-full"
                 onClick={() => {
                   onDelete(user._id);
                   onClose();
@@ -385,4 +395,33 @@ function TagSection({ label, tags }: { label: string; tags?: string[] }) {
       </div>
     </div>
   );
+}
+
+function StatusBadge({ status }: { status: UserStatus }) {
+  switch (status) {
+    case UserStatus.selected:
+      return (
+        <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 border-emerald-200 text-[10px] px-1.5 py-0">
+          Selected
+        </Badge>
+      );
+    case UserStatus.interview:
+      return (
+        <Badge className="bg-blue-500/10 text-blue-600 hover:bg-blue-500/10 border-blue-200 text-[10px] px-1.5 py-0">
+          Interview
+        </Badge>
+      );
+    case UserStatus.pass:
+      return (
+        <Badge className="bg-gray-500/10 text-gray-600 hover:bg-gray-500/10 border-gray-200 text-[10px] px-1.5 py-0">
+          Pass
+        </Badge>
+      );
+    default:
+      return (
+        <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+          Pending
+        </Badge>
+      );
+  }
 }

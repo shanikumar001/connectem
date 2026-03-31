@@ -37,9 +37,9 @@ export function Navbar({ onRequestAccess, onSignIn }: NavbarProps) {
     : "?";
 
   const navLinks = [
+    { label: "Mentors", href: "/mentors" },
+    { label: "Dashboard", href: "/dashboard", authOnly: true },
     { label: "How It Works", href: "/#how-it-works" },
-    { label: "Services", href: "/#philosophy" },
-    { label: "Trust", href: "/#trust" },
     { label: "Contact", href: "/#cta" },
   ];
 
@@ -61,16 +61,27 @@ export function Navbar({ onRequestAccess, onSignIn }: NavbarProps) {
           className="hidden md:flex items-center gap-7"
           aria-label="Main navigation"
         >
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              data-ocid={`nav.${link.label.toLowerCase().replace(/\s+/g, "_")}.link`}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks
+            .filter((link) => !link.authOnly || isLoggedIn)
+            .map((link) =>
+              link.href.startsWith("/") ? (
+                <Link
+                  key={link.label}
+                  to={link.href as any}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
         </nav>
 
         {/* Right Actions */}
@@ -91,9 +102,17 @@ export function Navbar({ onRequestAccess, onSignIn }: NavbarProps) {
                   className="flex items-center gap-2 hover:bg-muted rounded-full px-2 py-1 transition-colors"
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-foreground text-primary-foreground text-xs font-semibold">
-                      {initials}
-                    </AvatarFallback>
+                    {user?.mentorProfile?.profileImage || user?.companyProfile?.profileImage ? (
+                      <img 
+                        src={user.mentorProfile?.profileImage || user.companyProfile?.profileImage} 
+                        alt={displayName} 
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <AvatarFallback className="bg-foreground text-primary-foreground text-xs font-semibold">
+                        {initials}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                   <span className="text-sm font-medium max-w-[100px] truncate">
                     {displayName}
@@ -173,16 +192,29 @@ export function Navbar({ onRequestAccess, onSignIn }: NavbarProps) {
       {/* Mobile Menu */}
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-3">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="block text-sm text-muted-foreground hover:text-foreground py-1"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks
+            .filter((link) => !link.authOnly || isLoggedIn)
+            .map((link) =>
+              link.href.startsWith("/") ? (
+                <Link
+                  key={link.label}
+                  to={link.href as any}
+                  onClick={() => setMobileOpen(false)}
+                  className="block text-sm text-muted-foreground hover:text-foreground py-1"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="block text-sm text-muted-foreground hover:text-foreground py-1"
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
           <div className="pt-2 border-t border-border flex flex-col gap-2">
             <Button
               onClick={() => {
